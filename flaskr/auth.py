@@ -82,7 +82,21 @@ def load_logged_in_user():
             'SELECT * FROM user WHERE id = ?', (user_id,)
         ).fetchone()
 
+
+# 注销的时候需要把用户id从session中移除。然后load_logged_in_user就不会在后继请求中载入用户了
 @bp.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('index'))
+
+
+# 装饰器返回一个新的视图，该视图包含了传递给装饰器的原视图。新的函数检查用户 是否已载入。
+# 如果已载入，那么就继续正常执行原视图，否则就重定向到登录页面
+def login_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            return redirect(url_for('auth.login'))
+        return view(**kwargs)
+
+    return wrapped_view
