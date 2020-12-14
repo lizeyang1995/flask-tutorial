@@ -91,8 +91,9 @@ def logout():
     return redirect(url_for('index'))
 
 
-# 装饰器返回一个新的视图，该视图包含了传递给装饰器的原视图。新的函数检查用户 是否已载入。
+# 装饰器返回一个新的视图，该视图包含了传递给装饰器的原视图。新的函数检查用户是否已载入。
 # 如果已载入，那么就继续正常执行原视图，否则就重定向到登录页面
+# 也就是说必须登陆才能看到内容，直接复制网址只会被重定向到登陆页面
 def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
