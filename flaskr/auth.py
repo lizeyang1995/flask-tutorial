@@ -37,6 +37,7 @@ def register():
                 (username, generate_password_hash(password))
             )
             db.commit()
+            # 当使用蓝图的时候，蓝图的名称会添加到函数名称的前面
             return redirect(url_for('auth.login'))
         #  flash() 用于储存在渲染模块时可以调用的信息
         flash(error)
@@ -96,6 +97,7 @@ def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
+            # 当使用蓝图的时候，蓝图的名称会添加到函数名称的前面
             return redirect(url_for('auth.login'))
         return view(**kwargs)
 
