@@ -15,7 +15,7 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
     if request.method == 'POST':
-        username = register.form['username']
+        username = request.form['username']
         password = request.form['password']
         db = get_db()
         error = None
@@ -47,12 +47,12 @@ def register():
 @bp.route('/login', methods=('POST', 'GET',))
 def login():
     if request.method == 'POST':
-        username = register.form['username']
-        password = register.form['password']
+        username = request.form['username']
+        password = request.form['password']
         error = None
         db = get_db()
         user = db.execute(
-            'SELECT * FROM u,ser WHERE username = ?', (username)
+            'SELECT * FROM user WHERE username = ?', (username,)
         ).fetchone()
         if user is None:
             error = 'Incorrect username'
