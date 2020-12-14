@@ -70,8 +70,8 @@ def login():
     return render_template('auth/login.html')
 
 
-# bp.before_app_request() 注册一个 在视图函数之前运行的函数，不论其 URL 是什么。
-# load_logged_in_user 检查用户 id 是否已经储存在 session 中，并从数据库中获取用户数据
+# bp.before_app_request() 注册一个在视图函数之前运行的函数，不论URL是什么。
+# load_logged_in_user 检查用户id是否已经储存在session中，并从数据库中获取用户数据
 @bp.before_app_request
 def load_logged_in_user():
     user_id = session.get('user_id')
@@ -81,3 +81,8 @@ def load_logged_in_user():
         g.user = get_db().execute(
             'SELECT * FROM user WHERE id = ?', (user_id,)
         ).fetchone()
+
+@bp.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
