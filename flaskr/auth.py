@@ -51,17 +51,33 @@ def login():
         error = None
         db = get_db()
         user = db.execute(
-            'SELECT * FROM user WHERE username = ?', (username)
+            'SELECT * FROM u,ser WHERE username = ?', (username)
         ).fetchone()
         if user is None:
             error = 'Incorrect username'
         elif not check_password_hash(user['password'], password):
+            # check_password_hash() 以相同的方式哈希提交的 密码并安全的比较哈希值。如果匹配成功，那么密码就是正确的。
             error = 'Incorrect password'
 
         if error is None:
+            # session是一个dict，它用于储存横跨请求的值。当验证成功后，用户的 id 被储存于一个新的会话中。
+            # 会话数据被储存到一个向浏览器发送的 cookie 中，在后继请求中，浏览器会返回它。 Flask 会安全对数据进行sign以防数据被篡改。
             session.clear()
             session['user_id'] = user['id']
             return redirect(url_for('index'))
 
         flash(error)
     return render_template('auth/login.html')
+
+
+# bp.before_app_request() 注册一个 在视图函数之前运行的函数，不论其 URL 是什么。
+# load_logged_in_user 检查用户 id 是否已经储存在 session 中，并从数据库中获取用户数据
+@bp.before_app_request
+def load_logged_in_user():
+    user_id = session.get('user_id')
+    if user_id is None:
+        g.user = None
+    else:
+        g.user = get_db().execute(
+            'SELECT * FROM user WHERE id = ?', (user_id,)
+        ).fetchone()
